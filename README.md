@@ -50,7 +50,7 @@ The pipeline follows a simple, linear path: a CSV file uploaded to an S3 bucket 
 - [x] Created an IAM role for Glue (S3 read/write, Glue Catalog, Secrets Manager)
 - [x] Stood up a Redshift Serverless namespace and workgroup with an associated IAM role for S3 read access
 - [x] Configured an S3 lifecycle rule to expire `/staging` objects after two days
-- [ ] Uploaded a dummy CSV to S3 and ran a Glue Crawler to catalog it
+- [x] Uploaded a dummy CSV to S3 and ran a Glue Crawler to catalog it
 - [ ] Created a Glue Studio connection to Redshift and validated it with Test Connection
 - [ ] Built a Glue ETL job that reads the cataloged CSV, applies a trivial transform, and loads it into a Redshift table via the built-in Redshift connector
 - [ ] Confirmed data landed correctly in Redshift with a row-count check
