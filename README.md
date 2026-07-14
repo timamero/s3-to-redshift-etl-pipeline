@@ -40,6 +40,24 @@ The pipeline follows a simple, linear path: a CSV file uploaded to an S3 bucket 
 | AWS Secrets Manager          | Redshift credential storage               |
 | Amazon VPC                   | Private networking between services       |
 
+## Demo Screenshots
+
+**Empty Redshift Database**
+
+![Empty Redshift Database](./screenshots/redshift_query_employees_empty.png)
+
+**Glue Job Visual**
+
+![Glue Job Visual](./screenshots/glue_dummy_employees_etl_job_visual.png)
+
+**Glue Job Transform SQL Query**
+
+![Glue Job Transform SQL Query](./screenshots/glue_dummy_employees_transform.png)
+
+**Redshift Loaded with Employees Data**
+
+![Redshift Loaded with Employees Data](./screenshots/redshift_query_employees_success.png)
+
 ## Roadmap
 
 **Completed — infrastructure and connectivity spike:**
