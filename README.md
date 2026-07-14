@@ -1,7 +1,5 @@
 # S3 to Redshift ETL Pipeline
 
-![Status](https://img.shields.io/badge/status-in%20active%20development-yellow)
-
 ## Introduction
 
 This project stands up a minimal, working AWS ETL pipeline: raw data lands in S3, AWS Glue transforms it, and the result loads into Amazon Redshift. It exists to validate every piece of infrastructure — networking, IAM, service connectivity — end to end using a small dummy dataset, before layering in real-world complexity. It's the foundation for a follow-up project that expands this same pipeline to ingest and process real healthcare data.
