@@ -4,5 +4,5 @@ CREATE TABLE public.employees (
     last_name   VARCHAR(64),
     department  VARCHAR(64),
     hire_date   DATE,
-    salary      DECIMAL(10,2)
+    annual_salary  DECIMAL(10,2)
 );
