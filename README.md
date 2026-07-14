@@ -52,9 +52,9 @@ The pipeline follows a simple, linear path: a CSV file uploaded to an S3 bucket 
 - [x] Configured an S3 lifecycle rule to expire `/staging` objects after two days
 - [x] Uploaded a dummy CSV to S3
 - [x] Ran a Glue Crawler to catalog data
-- [ ] Created a Glue Studio connection to Redshift and validated it with Test Connection
-- [ ] Built a Glue ETL job that reads the cataloged CSV, applies a trivial transform, and loads it into a Redshift table via the built-in Redshift connector
-- [ ] Confirmed data landed correctly in Redshift with a row-count check
+- [x] Created a Glue Studio connection to Redshift and validated it with Test Connection
+- [x] Built a Glue ETL job that reads the cataloged CSV, applies a trivial transform, and loads it into a Redshift table via the built-in Redshift connector
+- [x] Confirmed data landed correctly in Redshift with a row-count check
 
 ## Expansion Plan
 
@@ -69,5 +69,15 @@ This project is the foundation for a follow-up pipeline that will:
   - Add a failure-path rule (e.g., an EventBridge target that sends a notification via SNS) if the Crawler or job fails, rather than only discovering issues on manual inspection
 - Extend the Glue ETL job with real FHIR-specific flattening logic (parsing nested resources, resolving cross-resource references)
 - Expand Redshift table design to support the full target schema (Patient, Encounter, Condition, Observation)
+
+### Actions to Take Based on Lessons Learned
+
+**Maintain a detailed process document.**
+Setting up an ETL pipeline in AWS involves many interdependent services, and small configuration gaps (a missing VPC endpoint, a mismatched schema, a stale IAM policy) are easy to lose track of without a written record. A process document should include:
+
+- Steps taken to configure each service and its permissions
+- Service connection configuration and the order dependencies between steps
+- Context on intermediate actions required between major setup steps
+- Root causes of issues encountered and how they were resolved
 
 <!-- See the companion repository for that build. -->
