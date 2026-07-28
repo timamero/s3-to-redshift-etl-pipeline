@@ -1,5 +1,9 @@
 # S3 to Redshift ETL Pipeline
 
+## Currently in Development
+
+This project is being expanded to ingest real Synthea FHIR data, extend the Glue ETL job with FHIR-specific flattening logic, and automate the pipeline with EventBridge. See [`PIPELINE_EXPANSION_PROCESS.md`](./PIPELINE_EXPANSION_PROCESS.md) for the detailed, in-progress process document.
+
 ## Introduction
 
 This project stands up a minimal, working AWS ETL pipeline: raw data lands in S3, AWS Glue transforms it, and the result loads into Amazon Redshift. It exists to validate every piece of infrastructure — networking, IAM, service connectivity — end to end using a small dummy dataset, before layering in real-world complexity. It's the foundation for a follow-up project that expands this same pipeline to ingest and process real healthcare data.
