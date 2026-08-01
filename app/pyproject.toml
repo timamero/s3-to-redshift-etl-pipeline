@@ -9,6 +9,7 @@ authors = [
 requires-python = ">=3.14"
 dependencies = [
     "boto3>=1.43.62",
+    "python-dotenv>=1.2.2",
 ]
 
 [project.scripts]
