@@ -7,7 +7,9 @@ authors = [
     { name = "Fatima Anne Camero", email = "54559570+timamero@users.noreply.github.com" }
 ]
 requires-python = ">=3.14"
-dependencies = []
+dependencies = [
+    "boto3>=1.43.62",
+]
 
 [project.scripts]
 app = "app:main"
