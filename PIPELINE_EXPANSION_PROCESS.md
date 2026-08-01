@@ -53,10 +53,11 @@ Phase 5 is deliberately sequenced after Phase 4, not in parallel — automating 
 **Steps:**
 
 1. Generate or download a small Synthea FHIR dataset (start with a handful of patients, matching the scale used in earlier prototyping — see the companion Databricks project for this same starting-small approach).
-2. Write a boto3 script that uploads each Bundle file to the bronze bucket under a dedicated prefix (e.g., `raw/fhir/`), using the existing IAM user's credentials.
-3. Confirm the existing bronze-read IAM policy (bucket-wide wildcard) covers the new prefix without modification.
-4. Run the script and verify file counts in S3 match the source dataset.
-5. `[Confirm and record: does the script need retry/error-handling logic for partial upload failures? Define expected behavior — e.g., log and skip vs. abort — before finalizing.]`
+2. Install boto3 and configure AWS credentials.
+3. Write a boto3 script that uploads each Bundle file to the bronze bucket under a dedicated prefix (e.g., `raw/fhir/`), using the existing IAM user's credentials.
+4. Confirm the existing bronze-read IAM policy (bucket-wide wildcard) covers the new prefix without modification.
+5. Run the script and verify file counts in S3 match the source dataset.
+6. `[Confirm and record: does the script need retry/error-handling logic for partial upload failures? Define expected behavior — e.g., log and skip vs. abort — before finalizing.]`
 
 **Outcome to confirm before moving to Phase 2:** raw FHIR Bundles are present in the bronze bucket and readable by the existing Glue Crawler/role.
 
