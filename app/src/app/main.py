@@ -4,7 +4,8 @@ from app.utils.s3_service import upload_file
 from app.config import config
 
 CURRENT_DIR = Path(__file__).parent
-FILE_PATH = CURRENT_DIR / "test-data.txt"
+DATA_DIR = CURRENT_DIR / "data"
+FILE_PATH = DATA_DIR / "test-data.txt"
 FILE_NAME = str(FILE_PATH)
 
 BUCKET_NAME = config.get("S3_BUCKET_NAME")
