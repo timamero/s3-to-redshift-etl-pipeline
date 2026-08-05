@@ -2,10 +2,11 @@
 
 ## Revision History
 
-| Date       | Phase | Change                   |
-| ---------- | ----- | ------------------------ |
-| 2026-07-28 | —     | Initial document created |
-| 2026-07-31 | —     | Update Phase 1 steps     |
+| Date       | Phase | Change                                         |
+| ---------- | ----- | ---------------------------------------------- |
+| 2026-07-28 | —     | Initial document created                       |
+| 2026-07-31 | 1     | Update steps                                   |
+| 2026-08-02 | 1     | Add error handling step to boto3 upload script |
 
 ## Purpose
 
@@ -59,7 +60,7 @@ Phase 5 is deliberately sequenced after Phase 4, not in parallel — automating 
 4. Write a boto3 script that uploads each Bundle file to the bronze bucket under a dedicated prefix (e.g., `raw/fhir/`), using the existing IAM user's credentials.
 5. Confirm the existing bronze-read IAM policy (bucket-wide wildcard) covers the new prefix without modification.
 6. Run the script and verify file counts in S3 match the source dataset.
-7. `[Confirm and record: does the script need retry/error-handling logic for partial upload failures? Define expected behavior — e.g., log and skip vs. abort — before finalizing.]`
+7. Add error handling that will log any failed uploads and continue with the next file, so a single failure doesn't block the entire dataset.
 
 **Outcome to confirm before moving to Phase 2:** raw FHIR Bundles are present in the bronze bucket and readable by the existing Glue Crawler/role.
 
