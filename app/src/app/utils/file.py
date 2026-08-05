@@ -1,10 +1,12 @@
 from pathlib import Path
 
 
-def file_list(num_of_files: int, directory):
-    path = Path(directory)
-    print("dir", path.name)
-    # print("path", path)
+def file_list(num_of_files: int, directory: Path):
+    """Create a list of file paths in the specified directory.
+    :param num_of_files: Number of files to return
+    :param directory: Directory to search for files
+    :return: List of file paths"""
+
     file_list = []
     cnt = 0
     for filepath in directory.iterdir():
