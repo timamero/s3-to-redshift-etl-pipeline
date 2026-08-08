@@ -1,4 +1,5 @@
 import boto3
+from boto3.exceptions import S3UploadFailedError
 from botocore.exceptions import ClientError
 import os
 
@@ -23,7 +24,7 @@ def upload_file(file_name, bucket, object_name=None):
     try:
         response = s3_client.upload_file(file_name, bucket, f"raw/{object_name}")
         logger.debug(f"Response: {response}")
-    except ClientError as e:
+    except (ClientError, S3UploadFailedError) as e:
         logger.error(e)
         return False
     return True

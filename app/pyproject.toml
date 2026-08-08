@@ -9,6 +9,8 @@ authors = [
 requires-python = ">=3.14"
 dependencies = [
     "boto3>=1.43.62",
+    "moto[s3]>=5.2.2",
+    "pytest>=9.1.1",
     "python-dotenv>=1.2.2",
 ]
 
