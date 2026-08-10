@@ -7,7 +7,7 @@ from app.config import config, logger
 CURRENT_DIR = Path(__file__).parent
 DATA_DIR = CURRENT_DIR / "data/fhir-sample"
 BUCKET_NAME = config.get("S3_BUCKET_NAME")
-NUM_FILES_TO_UPLOAD = 2
+NUM_FILES_TO_UPLOAD = 10
 
 if __name__ == "__main__":
     logger.info(f"""Uploading {NUM_FILES_TO_UPLOAD} files
