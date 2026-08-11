@@ -22,7 +22,7 @@ def upload_file(file_name, bucket, object_name=None):
     # Upload the file
     s3_client = boto3.client("s3")
     try:
-        response = s3_client.upload_file(file_name, bucket, f"raw/{object_name}")
+        response = s3_client.upload_file(file_name, bucket, f"raw/fhir/{object_name}")
         logger.debug(f"Response: {response}")
     except (ClientError, S3UploadFailedError) as e:
         logger.error(e)

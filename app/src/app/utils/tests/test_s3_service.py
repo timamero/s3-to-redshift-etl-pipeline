@@ -34,7 +34,7 @@ def aws_setup(aws_credentials):
         # Create a mocked S3 client and bucket
         s3_client = boto3.client("s3", region_name="us-east-1")
         bucket_name = "test-bucket"
-        bucket_prefix = "raw"
+        bucket_prefix = "raw/fhir/"
         s3_client.create_bucket(Bucket=bucket_name)
 
         yield {
@@ -77,7 +77,7 @@ class TestS3Service:
 
         # Verify that file exists in bucket
         response = s3_client.get_object(
-            Bucket=bucket_name, Key=f"{bucket_prefix}/{file_name}"
+            Bucket=bucket_name, Key=f"{bucket_prefix}{file_name}"
         )
         response_body = response["Body"].read().decode("utf-8")
 
