@@ -2,11 +2,13 @@
 
 ## Revision History
 
-| Date       | Phase | Change                                         |
-| ---------- | ----- | ---------------------------------------------- |
-| 2026-07-28 | —     | Initial document created                       |
-| 2026-07-31 | 1     | Update steps                                   |
-| 2026-08-02 | 1     | Add error handling step to boto3 upload script |
+| Date       | Phase | Change                                                                                     |
+| ---------- | ----- | ------------------------------------------------------------------------------------------ |
+| 2026-07-28 | —     | Initial document created                                                                   |
+| 2026-07-31 | 1     | Update steps                                                                               |
+| 2026-08-02 | 1     | Add error handling step to boto3 upload script                                             |
+| 2026-08-12 | 1     | Remove confirmation outcome to infer schema with Glue Crawler                              |
+| 2026-08-12 | 2     | Update steps to explicitly define schemas and flattening logic for each FHIR resource type |
 
 ## Purpose
 
@@ -62,7 +64,7 @@ Phase 5 is deliberately sequenced after Phase 4, not in parallel — automating 
 6. Run the script and verify file counts in S3 match the source dataset.
 7. Add error handling that will log any failed uploads and continue with the next file, so a single failure doesn't block the entire dataset.
 
-**Outcome to confirm before moving to Phase 2:** raw FHIR Bundles are present in the bronze bucket and readable by the existing Glue Crawler/role.
+**Outcome to confirm before moving to Phase 2:** raw FHIR Bundles are present in the bronze bucket.
 
 ---
 
@@ -70,17 +72,19 @@ Phase 5 is deliberately sequenced after Phase 4, not in parallel — automating 
 
 **Goal:** Replace the trivial transform logic with real FHIR flattening, producing four clean datasets: Patient, Encounter, Condition, Observation.
 
+**Deviation:** The Glue Crawler is not needed because the inferred schema would conflict across resource types. Use a defined schema in the Glue Job instead of the Crawler's schema.
+
 **Steps:**
 
-1. Re-run (or create a new) Glue Crawler against the `raw/fhir/` prefix to catalog the new data.
-2. `[Confirm: does Crawler-inferred schema conflict across resource types the way it did in the companion Databricks project, where reused field names like "name" collapsed to the wrong type? If so, an explicit schema — defined in the Glue job rather than relied upon from the Crawler — will be needed, following the same approach used there.]`
-3. In the Glue ETL job, add logic to:
-   - Filter/split by `resourceType` (Patient, Encounter, Condition, Observation)
+1. Create the Glue ETL job notebook.
+2. In the Glue ETL job, add logic to:
+   - Define the schemas for each `resourceType` (Patient, Encounter, Condition, Observation)
+   - Filter/split by `resourceType`
    - Flatten nested fields per resource type (e.g., `name`, `address` for Patient)
-   - Parse FHIR `reference` fields (e.g., `Patient/abc-123`) into plain join keys
+   - Parse FHIR `reference` fields (e.g., `urn:uuid:abc-123`) into plain join keys
    - Resolve Observation's multi-shape value fields (`valueQuantity`, `valueString`, `valueCodeableConcept`) into a single value column
-4. Set the Redshift target node(s) to use **Direct data connection** rather than Glue Data Catalog tables, based on the earlier finding that Catalog-routed writes can persist stale/incorrect type mappings.
-5. Run the job against a small sample first; confirm output before scaling to a larger dataset.
+3. Set the Redshift target node(s) to use **Direct data connection** rather than Glue Data Catalog tables, based on the earlier finding that Catalog-routed writes can persist stale/incorrect type mappings.
+4. Run the job against a small sample first; confirm output before scaling to a larger dataset.
 
 **Outcome to confirm before moving to Phase 3:** four flattened datasets are produced with correct types and no unresolved nulls in key fields.
 
