@@ -9,6 +9,7 @@
 | 2026-08-02 | 1     | Add error handling step to boto3 upload script                                             |
 | 2026-08-12 | 1     | Remove confirmation outcome to infer schema with Glue Crawler                              |
 | 2026-08-12 | 2     | Update steps to explicitly define schemas and flattening logic for each FHIR resource type |
+| 2026-08-27 | 2     | Update steps to include creation of inline policies for IAM roles                          |
 
 ## Purpose
 
@@ -76,15 +77,16 @@ Phase 5 is deliberately sequenced after Phase 4, not in parallel — automating 
 
 **Steps:**
 
-1. Create the Glue ETL job notebook.
-2. In the Glue ETL job, add logic to:
+1. Add inline policy for `iam:PassRole` to the Glue job's IAM role, so it can pass itself to AWS Glue when running the job. This is required to guardrail the job's permissions and avoid using a broader role than necessary.
+2. Create the Glue ETL job notebook.
+3. In the Glue ETL job, add logic to:
    - Define the schemas for each `resourceType` (Patient, Encounter, Condition, Observation)
    - Filter/split by `resourceType`
    - Flatten nested fields per resource type (e.g., `name`, `address` for Patient)
    - Parse FHIR `reference` fields (e.g., `urn:uuid:abc-123`) into plain join keys
    - Resolve Observation's multi-shape value fields (`valueQuantity`, `valueString`, `valueCodeableConcept`) into a single value column
-3. Set the Redshift target node(s) to use **Direct data connection** rather than Glue Data Catalog tables, based on the earlier finding that Catalog-routed writes can persist stale/incorrect type mappings.
-4. Run the job against a small sample first; confirm output before scaling to a larger dataset.
+4. Set the Redshift target node(s) to use **Direct data connection** rather than Glue Data Catalog tables, based on the earlier finding that Catalog-routed writes can persist stale/incorrect type mappings.
+5. Run the job against a small sample first; confirm output before scaling to a larger dataset.
 
 **Outcome to confirm before moving to Phase 3:** four flattened datasets are produced with correct types and no unresolved nulls in key fields.
 
