@@ -2,14 +2,15 @@
 
 ## Revision History
 
-| Date       | Phase | Change                                                                                     |
-| ---------- | ----- | ------------------------------------------------------------------------------------------ |
-| 2026-07-28 | —     | Initial document created                                                                   |
-| 2026-07-31 | 1     | Update steps                                                                               |
-| 2026-08-02 | 1     | Add error handling step to boto3 upload script                                             |
-| 2026-08-12 | 1     | Remove confirmation outcome to infer schema with Glue Crawler                              |
-| 2026-08-12 | 2     | Update steps to explicitly define schemas and flattening logic for each FHIR resource type |
-| 2026-08-27 | 2     | Update steps to include creation of inline policies for IAM roles                          |
+| Date       | Phase | Change                                                                                                                                        |
+| ---------- | ----- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-07-28 | —     | Initial document created                                                                                                                      |
+| 2026-07-31 | 1     | Update steps                                                                                                                                  |
+| 2026-08-02 | 1     | Add error handling step to boto3 upload script                                                                                                |
+| 2026-08-12 | 1     | Remove confirmation outcome to infer schema with Glue Crawler                                                                                 |
+| 2026-08-12 | 2     | Update steps to explicitly define schemas and flattening logic for each FHIR resource type                                                    |
+| 2026-08-27 | 2     | Update steps to include creation of inline policies for IAM roles                                                                             |
+| 2026-08-27 | 3     | Update steps to include quality checks for nulls and duplicates in key fields, and to write each dataset to a separate staging location in S3 |
 
 ## Purpose
 
@@ -85,6 +86,9 @@ Phase 5 is deliberately sequenced after Phase 4, not in parallel — automating 
    - Flatten nested fields per resource type (e.g., `name`, `address` for Patient)
    - Parse FHIR `reference` fields (e.g., `urn:uuid:abc-123`) into plain join keys
    - Resolve Observation's multi-shape value fields (`valueQuantity`, `valueString`, `valueCodeableConcept`) into a single value column
+   - Check for unexpected nulls in key fields and duplicate IDs, logging the count of each to confirm data quality
+   - Cast date and timestamp fields to the correct Redshift-compatible types, and log any parsing errors
+   - Write each flattened dataset to a separate staging location in S3 (e.g., `staging/patient/`, `staging/encounter/`, etc.) in Parquet format, with a single file per dataset for simplicity
 4. Set the Redshift target node(s) to use **Direct data connection** rather than Glue Data Catalog tables, based on the earlier finding that Catalog-routed writes can persist stale/incorrect type mappings.
 5. Run the job against a small sample first; confirm output before scaling to a larger dataset.
 
