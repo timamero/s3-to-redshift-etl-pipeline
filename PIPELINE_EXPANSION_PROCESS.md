@@ -2,15 +2,16 @@
 
 ## Revision History
 
-| Date       | Phase | Change                                                                                                                                        |
-| ---------- | ----- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-07-28 | —     | Initial document created                                                                                                                      |
-| 2026-07-31 | 1     | Update steps                                                                                                                                  |
-| 2026-08-02 | 1     | Add error handling step to boto3 upload script                                                                                                |
-| 2026-08-12 | 1     | Remove confirmation outcome to infer schema with Glue Crawler                                                                                 |
-| 2026-08-12 | 2     | Update steps to explicitly define schemas and flattening logic for each FHIR resource type                                                    |
-| 2026-08-27 | 2     | Update steps to include creation of inline policies for IAM roles                                                                             |
-| 2026-08-27 | 3     | Update steps to include quality checks for nulls and duplicates in key fields, and to write each dataset to a separate staging location in S3 |
+| Date       | Phase | Change                                                                                                                                                                                                                            |
+| ---------- | ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-07-28 | —     | Initial document created                                                                                                                                                                                                          |
+| 2026-07-31 | 1     | Update steps                                                                                                                                                                                                                      |
+| 2026-08-02 | 1     | Add error handling step to boto3 upload script                                                                                                                                                                                    |
+| 2026-08-12 | 1     | Remove confirmation outcome to infer schema with Glue Crawler                                                                                                                                                                     |
+| 2026-08-12 | 2     | Update steps to explicitly define schemas and flattening logic for each FHIR resource type                                                                                                                                        |
+| 2026-08-27 | 2     | Update steps to include creation of inline policies for IAM roles                                                                                                                                                                 |
+| 2026-08-27 | 3     | Update steps to include quality checks for nulls and duplicates in key fields, and to write each dataset to a separate staging location in S3                                                                                     |
+| 2026-09-03 | 2, 3  | Update steps for setting and updating Redshift target nodes to use Direct data connection rather than Glue Data Catalog tables, based on the earlier finding that Catalog-routed writes can persist stale/incorrect type mappings |
 
 ## Purpose
 
@@ -89,8 +90,7 @@ Phase 5 is deliberately sequenced after Phase 4, not in parallel — automating 
    - Check for unexpected nulls in key fields and duplicate IDs, logging the count of each to confirm data quality
    - Cast date and timestamp fields to the correct Redshift-compatible types, and log any parsing errors
    - Write each flattened dataset to a separate staging location in S3 (e.g., `staging/patient/`, `staging/encounter/`, etc.) in Parquet format, with a single file per dataset for simplicity
-4. Set the Redshift target node(s) to use **Direct data connection** rather than Glue Data Catalog tables, based on the earlier finding that Catalog-routed writes can persist stale/incorrect type mappings.
-5. Run the job against a small sample first; confirm output before scaling to a larger dataset.
+4. Run the job against a small sample first; confirm output before scaling to a larger dataset.
 
 **Outcome to confirm before moving to Phase 3:** four flattened datasets are produced with correct types and no unresolved nulls in key fields.
 
@@ -104,8 +104,9 @@ Phase 5 is deliberately sequenced after Phase 4, not in parallel — automating 
 
 1. Drop the dummy `employees` table (or leave it in place under a clearly separate name, if still needed for reference).
 2. Create `patients`, `encounters`, `conditions`, and `observations` tables via DDL, with explicit column types (not auto-generated) — see the companion Databricks project's Delta table schema for the target field list to mirror.
-3. Update the Glue ETL job's Redshift target nodes to point at the correct table per dataset.
-4. Run the job and confirm data lands in all four tables with the expected row counts.
+3. Set the Redshift target node(s) to use **Direct data connection** rather than Glue Data Catalog tables, based on the earlier finding that Catalog-routed writes can persist stale/incorrect type mappings.
+4. Update the Glue ETL job's Redshift target nodes to point at the correct table per dataset.
+5. Run the job and confirm data lands in all four tables with the expected row counts.
 
 **Outcome to confirm before moving to Phase 4:** all four Redshift tables are populated and queryable.
 
