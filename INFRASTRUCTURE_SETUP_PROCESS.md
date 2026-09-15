@@ -8,10 +8,10 @@ For the process covering FHIR ingestion, Glue ETL extension, and EventBridge aut
 
 ## Revision History
 
-| Date       | Phase   | Change                                                                                                                              |
-| ---------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-09-08 | —       | Initial document created, covering completed infrastructure setup                                                                   |
-| 2026-09-15 | 3, 4, 7 | Added notes about incurring costs for Redshift and Interface VPC endpoints, and about the Glue Connection's reusability across jobs |
+| Date       | Phase   | Change                                                                                                                                        |
+| ---------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-09-08 | —       | Initial document created, covering completed infrastructure setup                                                                             |
+| 2026-09-15 | 3, 4, 7 | Added notes about incurring costs for Redshift, secrets, and Interface VPC endpoints, and about the Glue Connection's reusability across jobs |
 
 ## Phase Overview
 
@@ -75,7 +75,7 @@ For the process covering FHIR ingestion, Glue ETL extension, and EventBridge aut
 
 **Outcome confirmed:** namespace and workgroup show as Available; admin secret exists in Secrets Manager.
 
-**Note:** The Redshift namespace and workgroup incur a small hourly cost while active, and a per-GB data storage charge. When taking a pause from this project, consider pausing or deleting the namespace/workgroup to avoid ongoing charges, and recreate them later if/when the pipeline is rebuilt.
+**Note:** The secrets and Redshift namespace and workgroup incur a small hourly cost while active, and a per-GB data storage charge. When taking a pause from this project, consider pausing or deleting the secrets and namespace/workgroup to avoid ongoing charges, and recreate them later if/when the pipeline is rebuilt.
 
 ---
 
