@@ -12,6 +12,8 @@ For the process covering FHIR ingestion, Glue ETL extension, and EventBridge aut
 | ---------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
 | 2026-09-08 | —       | Initial document created, covering completed infrastructure setup                                                                             |
 | 2026-09-15 | 3, 4, 7 | Added notes about incurring costs for Redshift, secrets, and Interface VPC endpoints, and about the Glue Connection's reusability across jobs |
+| 2026-09-22 | 7       | Added notes about Redshift query editor v2 and stale connection issues after workgroup recreation                                             |
+| 2026-09-22 | 3       | Renamed Redshift namespace and workgroup to `synthea-namespace` and `synthea-workgroup`.                                                      |
 
 ## Phase Overview
 
@@ -67,7 +69,7 @@ For the process covering FHIR ingestion, Glue ETL extension, and EventBridge aut
 
 **Steps:**
 
-1. Created a Redshift Serverless namespace (`redshift-synthea-namespace`) and workgroup (`redshift-synthea-workgroup`), with a database name matching the project.
+1. Created a Redshift Serverless namespace (`synthea-namespace`) and workgroup (`synthea-workgroup`), with a database name matching the project.
 2. Enabled **"Manage admin credentials in AWS Secrets Manager"** during namespace creation, so Redshift generates and stores its own admin credentials rather than requiring a manually-set password.
 3. Left encryption on the default AWS-owned KMS key (no custom key needed for this project's scope).
 4. Attached the default VPC, its subnets, and the `glue-redshift-sg` security group to the workgroup's network configuration — deselecting the account's default security group, so the workgroup's effective access is defined by exactly one, auditable security group.
@@ -136,7 +138,10 @@ For the process covering FHIR ingestion, Glue ETL extension, and EventBridge aut
 
 **Outcome confirmed:** Test connection succeeded.
 
-**Notes:** Because the Glue Connection is a reusable object, it can be used in multiple Glue jobs. If the Redshift workgroup is ever deleted and recreated, the connection will need to be updated with the new Secrets Manager secret ARN.
+**Notes:**
+
+- If using Redshift query editor v2 after Redshift workgroup recreation, the database will not be listed and queries will fail. Remove the stale connection in the editor and re-add it using the new workgroup endpoint to restore query access. Re-create the target table if it was dropped and recreated, and re-run the Glue job to repopulate it.
+- Because the Glue Connection is a reusable object, it can be used in multiple Glue jobs. If the Redshift workgroup is ever deleted and recreated, the connection will need to be updated with the new Secrets Manager secret ARN.
 
 ---
 
