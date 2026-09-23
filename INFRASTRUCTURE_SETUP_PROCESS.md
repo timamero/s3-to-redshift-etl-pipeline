@@ -197,8 +197,7 @@ For the process covering FHIR ingestion, Glue ETL extension, and EventBridge aut
 **Root cause:** the Redshift target node was set to route through a Glue Data Catalog table definition for the target, which had its own separately inferred (and looser) schema. Explicit casts applied earlier in the job did not reconcile against this stale Catalog-side definition.
 **Resolution:** recreated the target table, and switched the Redshift target node to **Direct data connection**, which maps the job's actual output schema to the real Redshift table rather than routing through a separate Catalog schema.
 
----
-
+<!--
 ## How to Maintain This Document
 
 This document reflects completed work, but infrastructure occasionally changes (e.g., credential rotation, added endpoints, security group adjustments). Keep it accurate over time using these conventions:
@@ -217,3 +216,4 @@ Don't silently edit past steps. Add a new step noting the change and why, and ma
 
 **Updating the Revision History:**
 Add a row any time a phase is added, a step is materially changed, or an issue is logged — not for minor wording fixes. Use the date, the phase affected (or `—` for document-wide changes), and a one-line description.
+-->
