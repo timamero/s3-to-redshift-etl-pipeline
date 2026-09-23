@@ -153,6 +153,17 @@ Phase 5 is deliberately sequenced after Phase 4, not in parallel — automating 
 
 ## Issue Log
 
+### Writing to Redshift via Glue Notebook job fails due to connection error
+
+**Phase:** 3
+
+**Symptom:** `java.sql.SQLException: The connection attempt failed.` when running the Glue Notebook ETL job to write to Redshift.
+
+**Root cause:** Incorrect "dbtable" value (left out schema in name) passed to connection options in the Glue job, causing the Redshift connection to fail. Also the Glue Connection to Redshift was stale after the Redshift workgroup was recreated, which invalidated the connection.
+
+**Resolution:** Set "dbtable" to the correct target table name in the Glue job's connection options. Re-created the Glue Connection to Redshift and confirmed the connection test passes.
+
+<!--
 Record issues here as they're encountered and resolved, using this format:
 
 ```
@@ -162,9 +173,9 @@ Record issues here as they're encountered and resolved, using this format:
 **Root cause:** [what actually caused it]
 **Resolution:** [what fixed it]
 ```
+-->
 
----
-
+<!--
 ## How to Maintain This Document
 
 This document should be updated as work proceeds, not written once and left static. Follow these conventions so additions stay consistent:
@@ -186,3 +197,4 @@ Don't silently edit past steps. Add a new step noting the change and why, and le
 
 **Scope discipline:**
 Keep each phase's steps to the mechanics of that phase only. If a step reveals a need for something outside the current phase's scope (e.g., a new IAM permission needed only for Phase 5 work), note it briefly where it's discovered, then move the actual implementation detail to the relevant phase's section.
+-->
