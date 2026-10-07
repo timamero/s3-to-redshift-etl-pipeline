@@ -23,7 +23,7 @@ This is a living document. See **How to Maintain This Document** at the end for 
 
 The pipeline currently consists of validated infrastructure and a working end-to-end connectivity spike using dummy data. This section summarizes what exists; a fully detailed account of how it was built is maintained separately.
 
-**Detailed infrastructure setup process:** `[link placeholder — docs/infrastructure-setup-process.md]`
+**Detailed infrastructure setup process:** [`INFRASTRUCTURE_SETUP_PROCESS.md`](./INFRASTRUCTURE_SETUP_PROCESS.md)
 
 **Summary of current state:**
 
