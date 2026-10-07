@@ -163,6 +163,13 @@ Phase 5 is deliberately sequenced after Phase 4, not in parallel — automating 
 
 **Resolution:** Set "dbtable" to the correct target table name in the Glue job's connection options. Re-created the Glue Connection to Redshift and confirmed the connection test passes.
 
+### Writing to Redshift via Glue Notebook job fails for certain resource types due to type mismatch
+
+**Phase:** 3
+**Symptom:** The patients table successfully writes to Redshift, but the remaining three tables (encounters, conditions, observations) fail with a type mismatch error when the Glue job attempts to write to Redshift.
+**Root cause:** Some date and timestamp fields in the FHIR data were not being cast to Redshift-compatible types in the Glue job, causing a type mismatch when writing to Redshift.
+**Resolution:** Updated the Glue job to explicitly cast all date and timestamp fields to Redshift-compatible types before writing to Redshift. Verified that all four tables now write successfully without type mismatch errors.
+
 <!--
 Record issues here as they're encountered and resolved, using this format:
 
