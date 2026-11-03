@@ -126,20 +126,25 @@ Phase 5 is deliberately sequenced after Phase 4, not in parallel — automating 
 
 ---
 
-## Phase 5: EventBridge Automation
+## Phase 5: EventBridge Automation (UPDATE IN PROGRESS)
 
 **Goal:** Remove the manual Crawler → Job trigger step, so new data lands and processes automatically.
 
 **Steps:**
 
 1. Enable EventBridge notifications on the bronze S3 bucket.
-2. Create an EventBridge rule matching S3 object-created events for the `raw/fhir/` prefix.
-3. Configure that rule to trigger the Glue Crawler.
-4. `[Confirm and record: the specific mechanism used to chain "Crawler completion" to "start the ETL job" — e.g., a second EventBridge rule matching a Glue Crawler state-change event, versus a Glue Workflow/trigger configured for "on Crawler success." Document whichever is implemented, including the exact event pattern used.]`
-5. Create a failure-path rule: on Crawler or Job failure state, publish to an SNS topic (with a subscribed email or other endpoint) so failures surface without manual inspection.
-6. Test by uploading a new file and confirming the full chain runs without manual intervention, including a deliberate failure test to confirm the SNS alert fires.
+2. Create a Glue Trigger that runs the Glue ETL job notebook.
+3. Create a Glue Workflow and add the trigger created in the previous step.
+4. Create an EventBridge rule matching S3 object-created events for the `raw/fhir/` prefix. Set the target to be the Glue Workflow that was created in the previous step.
+5. `[Confirm and record: the specific mechanism used to chain "Crawler completion" to "start the ETL job" — e.g., a second EventBridge rule matching a Glue Crawler state-change event, versus a Glue Workflow/trigger configured for "on Crawler success." Document whichever is implemented, including the exact event pattern used.]`
+6. Create a failure-path rule: on Crawler or Job failure state, publish to an SNS topic (with a subscribed email or other endpoint) so failures surface without manual inspection.
+7. Test by uploading a new file and confirming the full chain runs without manual intervention, including a deliberate failure test to confirm the SNS alert fires.
 
 **Outcome to confirm:** new data uploaded to the bronze bucket triggers cataloging, transformation, and load with no manual steps, and failures generate a visible alert.
+
+**References:**
+
+- [Enabling Amazon EventBridge](https://docs.aws.amazon.com/AmazonS3/latest/userguide/enable-event-notifications-eventbridge.html)
 
 ---
 
