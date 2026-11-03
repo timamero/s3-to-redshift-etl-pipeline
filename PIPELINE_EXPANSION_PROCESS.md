@@ -175,6 +175,13 @@ Phase 5 is deliberately sequenced after Phase 4, not in parallel — automating 
 **Root cause:** Some date and timestamp fields in the FHIR data were not being cast to Redshift-compatible types in the Glue job, causing a type mismatch when writing to Redshift.
 **Resolution:** Updated the Glue job to explicitly cast all date and timestamp fields to Redshift-compatible types before writing to Redshift. Verified that all four tables now write successfully without type mismatch errors.
 
+### Glue notebook fails to execute because the parent workflow does not trigger
+
+**Phase:** 5
+**Symptom:** Glue notebook fails to run because the workflow does not run.
+**Root cause:** The Glue trigger was configured with the incorrect trigger type. It is not possible to set the type to EventBridge event when creating it separately from the Glue workflow.
+**Resolution:** Create the Glue workflow first, then add the trigger in the workflow graph interface. Set the trigger type to EventBridge event.
+
 <!--
 Record issues here as they're encountered and resolved, using this format:
 
