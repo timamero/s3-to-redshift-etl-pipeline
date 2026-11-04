@@ -133,12 +133,14 @@ Phase 5 is deliberately sequenced after Phase 4, not in parallel — automating 
 **Steps:**
 
 1. Enable EventBridge notifications on the bronze S3 bucket.
-2. Create a Glue Trigger that runs the Glue ETL job notebook.
-3. Create a Glue Workflow and add the trigger created in the previous step.
-4. Create an EventBridge rule matching S3 object-created events for the `raw/fhir/` prefix. Set the target to be the Glue Workflow that was created in the previous step.
-5. `[Confirm and record: the specific mechanism used to chain "Crawler completion" to "start the ETL job" — e.g., a second EventBridge rule matching a Glue Crawler state-change event, versus a Glue Workflow/trigger configured for "on Crawler success." Document whichever is implemented, including the exact event pattern used.]`
-6. Create a failure-path rule: on Crawler or Job failure state, publish to an SNS topic (with a subscribed email or other endpoint) so failures surface without manual inspection.
-7. Test by uploading a new file and confirming the full chain runs without manual intervention, including a deliberate failure test to confirm the SNS alert fires.
+2. Create a Glue Workflow (`glue-synthea-etl-workflow`), then add a new trigger (`glue-synthea-etl-notebook-trigger`) in the workflow graph interface with the trigger type set to EventBridge event.
+3. In the Glue Workflow graph interface, add node set to the Glue ETL job notebook.
+4. Create an IAM role (`event-bridge-synthea-etl-role`) with a trust policy allowing the AWS Glue service to assume it.
+5. Create and attach a custom policy that includes `glue:NotifyEvent` and `glue:StartWorkflowRun` actions.
+6. Create an EventBridge rule matching S3 object-created events for the `raw/fhir/` prefix. Set the target to be the Glue Workflow that was created in the previous step.
+7. Create a success-path rule: on Job success state, publish to an SNS topic (with a subscribed email or other endpoint) so successes surface without manual inspection.
+8. Create a failure-path rule: on Job failure state, publish to an SNS topic (with a subscribed email or other endpoint) so failures surface without manual inspection.
+9. Test by uploading a new file and confirming the full chain runs without manual intervention, including a deliberate failure test to confirm the SNS alert fires.
 
 **Outcome to confirm:** new data uploaded to the bronze bucket triggers cataloging, transformation, and load with no manual steps, and failures generate a visible alert.
 
