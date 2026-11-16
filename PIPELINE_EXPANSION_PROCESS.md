@@ -12,6 +12,7 @@
 | 2026-08-27 | 2     | Update steps to include creation of inline policies for IAM roles                                                                                                                                                                 |
 | 2026-08-27 | 3     | Update steps to include quality checks for nulls and duplicates in key fields, and to write each dataset to a separate staging location in S3                                                                                     |
 | 2026-09-03 | 2, 3  | Update steps for setting and updating Redshift target nodes to use Direct data connection rather than Glue Data Catalog tables, based on the earlier finding that Catalog-routed writes can persist stale/incorrect type mappings |
+| 2026-11-16 | 5     | Update steps to include creation of SNS topic and subscription for Glue job status notifications                                                                                                                                  |
 
 ## Purpose
 
@@ -126,23 +127,25 @@ Phase 5 is deliberately sequenced after Phase 4, not in parallel — automating 
 
 ---
 
-## Phase 5: EventBridge Automation (UPDATE IN PROGRESS)
+## Phase 5: EventBridge Automation
 
-**Goal:** Remove the manual Crawler → Job trigger step, so new data lands and processes automatically.
+**Goal:** Remove the manual Job trigger step, so new data lands and processes automatically.
 
 **Steps:**
 
 1. Enable EventBridge notifications on the bronze S3 bucket.
-2. Create a Glue Workflow (`glue-synthea-etl-workflow`), then add a new trigger (`glue-synthea-etl-notebook-trigger`) in the workflow graph interface with the trigger type set to EventBridge event.
+2. Create a Glue Workflow (`glue-synthea-etl-workflow`), then add a new trigger (`glue-synthea-etl-notebook-trigger`) in the workflow graph interface with the trigger type set to EventBridge event. Set the Max concurrency to 1 to avoid overlapping runs.
 3. In the Glue Workflow graph interface, add node set to the Glue ETL job notebook.
-4. Create an IAM role (`event-bridge-synthea-etl-role`) with a trust policy allowing the AWS Glue service to assume it.
+4. Create an IAM role (`eventbridge-synthea-start-glue-role`) with a trust policy allowing the EventBridge service to assume the role.
 5. Create and attach a custom policy that includes `glue:NotifyEvent` and `glue:StartWorkflowRun` actions.
-6. Create an EventBridge rule matching S3 object-created events for the `raw/fhir/` prefix. Set the target to be the Glue Workflow that was created in the previous step.
-7. Create a success-path rule: on Job success state, publish to an SNS topic (with a subscribed email or other endpoint) so successes surface without manual inspection.
-8. Create a failure-path rule: on Job failure state, publish to an SNS topic (with a subscribed email or other endpoint) so failures surface without manual inspection.
-9. Test by uploading a new file and confirming the full chain runs without manual intervention, including a deliberate failure test to confirm the SNS alert fires.
+6. Create an EventBridge rule (`eventbridge-synthea-upload-rule`) matching S3 object-created events for the `raw/fhir/` prefix. Set the target to be the Glue Workflow.
+7. Create SNS topic (`topic-synthea-glue-job-status`) with the following display name: "AWS Notifications - Glue Job Status Chance". Create and confirm email subscription.
+8. Create an IAM role (`eventbridge-synthea-publish-glue-status-change-role`) with a trust policy allowing the EventBridge service to assume the role.
+9. Create and attach a custom policy that includes `"sns:Publish"` actions.
+10. Create EventBridge Glue status change rule (`eventbridge-synthea-glue-status-change-rule`): on Job success, failure, or timeout state, publish to an SNS topic with a subscribed email so successes or failures surface without manual inspection.
+11. Test by uploading a new file and confirming the full chain runs without manual intervention, including a deliberate failure test to confirm the SNS alert fires.
 
-**Outcome to confirm:** new data uploaded to the bronze bucket triggers cataloging, transformation, and load with no manual steps, and failures generate a visible alert.
+**Outcome to confirm:** New data uploaded to the bronze bucket triggers cataloging, transformation, and load with no manual steps, and failures generate a visible alert.
 
 **References:**
 
@@ -150,11 +153,11 @@ Phase 5 is deliberately sequenced after Phase 4, not in parallel — automating 
 
 ---
 
-## Phase 6 (Future): Streaming Ingestion
+<!-- ## Phase 6 (Future): Streaming Ingestion
 
 **Goal:** Evolve ingestion from batch file uploads toward stream processing of incoming FHIR data.
 
-`[This phase is intentionally undefined in detail at this stage. Before beginning, define: the source/trigger for a "stream" in this context (e.g., a continuous feed vs. simulated near-real-time batches), whether this uses Kinesis, a queue-based pattern, or another mechanism, and how it interacts with or replaces the EventBridge-triggered batch flow from Phase 5. Do not begin implementation until this scope is defined.]`
+`[This phase is intentionally undefined in detail at this stage. Before beginning, define: the source/trigger for a "stream" in this context (e.g., a continuous feed vs. simulated near-real-time batches), whether this uses Kinesis, a queue-based pattern, or another mechanism, and how it interacts with or replaces the EventBridge-triggered batch flow from Phase 5. Do not begin implementation until this scope is defined.]` -->
 
 ---
 
